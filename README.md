@@ -110,3 +110,32 @@ Whenever you modify `3rdparty/python/*-requirements.txt`, regenerate the hermeti
 2. Define dependencies in `3rdparty/python/<project_name>-requirements.txt` and register the resolve in `pants.toml` and `3rdparty/python/BUILD`.
 3. Add a `BUILD` file inside `projects/<project_name>/BUILD` with `python_sources`, `python_tests`, and optional `pex_binary` / `docker_image` targets.
 4. Run `./pants generate-lockfiles` to generate its lockfile.
+
+---
+
+## Virtual Environments & Pre-commit
+
+### 1. Developer Tooling Virtualenv (`.venv`)
+A local virtual environment is used for repository tooling like `pre-commit`:
+```bash
+# Setup virtual environment and pre-commit hooks
+python3 -m venv .venv
+.venv/bin/pip install pre-commit
+.venv/bin/pre-commit install
+```
+
+### 2. Exporting Project Virtualenvs (for IDEs / Jupyter)
+Rather than manually running `pip install` which causes dependency drift, Pants can export an exact virtualenv matching any project's hermetic lockfile:
+```bash
+# Export the churn_prediction environment for your IDE / Jupyter kernel
+./pants export --resolve=churn_resolve
+
+# The virtual environment is created at:
+# dist/export/python/virtualenvs/churn_resolve/3.11.*/
+```
+
+### 3. Running Pre-commit
+Git hooks are automatically run on `git commit`. To run checks manually across all files:
+```bash
+.venv/bin/pre-commit run --all-files
+```

@@ -157,3 +157,24 @@ If packaging artifacts (`pex_binary` or `docker_image`), also test the build:
 ```
 
 **Never declare a task done if any of the above commands fail.**
+
+---
+
+## 7. Virtual Environments & Pre-commit Git Hooks
+
+### Virtual Environment Policy
+- **Pants Execution**: Pants runs build, test, and package actions in hermetic, isolated sandboxes directly from lockfiles. Pants NEVER executes inside or pollutes local virtual environments.
+- **Root `.venv`**: Used strictly for repository-level developer tooling (such as `pre-commit`).
+- **Project-Specific Environments (for IDEs / Jupyter kernels)**: Generated cleanly on-demand using Pants export:
+  ```bash
+  ./pants export --resolve=<project_resolve>
+  # Virtual environment is generated at dist/export/python/virtualenvs/<project_resolve>/<version>/
+  ```
+
+### Pre-commit Integration
+Pre-commit is installed in `.venv` and delegates linting, formatting, typechecking, and testing directly to Pants:
+```bash
+# Run all pre-commit hooks manually across the repo
+.venv/bin/pre-commit run --all-files
+```
+When committing changes via `git commit`, pre-commit hooks run automatically on changed targets using `--changed-since=HEAD`.
