@@ -1,0 +1,32 @@
+[GLOBAL]
+pants_version = "2.24.1"
+backend_packages = [
+    "pants.backend.python",
+    "pants.backend.experimental.python.lint.ruff.check",
+    "pants.backend.experimental.python.lint.ruff.format",
+    "pants.backend.build_files.fmt.ruff",
+    "pants.backend.python.typecheck.mypy",
+    "pants.backend.docker",
+]
+
+[source]
+root_patterns = [
+    "/libs/core",
+    "/projects/churn_prediction",
+]
+
+[python]
+interpreter_constraints = ["==3.11.*"]
+enable_resolves = true
+default_resolve = "core_resolve"
+
+[python.resolves]
+core_resolve = "3rdparty/python/core.lock"
+churn_resolve = "3rdparty/python/churn.lock"
+
+[python.resolves_to_interpreter_constraints]
+core_resolve = ["==3.11.*"]
+churn_resolve = ["==3.11.*"]
+
+[mypy]
+config = "mypy.ini"
